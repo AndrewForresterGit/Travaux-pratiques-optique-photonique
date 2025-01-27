@@ -14,53 +14,54 @@ def get_csv_data(filepath):
             t.append(float(data[0]))
             sig1.append(0.2*float(data[1])-60)
             sig2.append(float(data[2]))
-    return t, sig1, sig2
+            
+    return np.array(t), np.array(sig1), np.array(sig2)
 
 def increasing_sampling(sig, sampling_range):
     samples = [i for i in range(*sampling_range)]
-    averages = []
+    standard_deviations = []
     for i in samples:
         sample_sig = sig[0:i]
-        averages.append(sum(sample_sig)/len(sample_sig))
+        standard_deviations.append(np.std(sample_sig))
 
-    return samples, averages
+    return np.array(samples), np.array(standard_deviations)
 
 data_path = 'donnees/scope_total.csv'
 
 t, sync, sig = get_csv_data(data_path)
-sync = np.array(sync)
-sig = np.array(sig)
+t = np.arange(0, len(sig), 1)
 
-sig_haut = np.trim_zeros(np.sort(
-    np.where(sig > (max(sig)+min(sig))/2, sig, 0)))
 
-sig_bas = np.trim_zeros(np.sort(
-    np.where(sig < (max(sig)+min(sig))/2, sig, 0)))
+sig_high = np.where(sig > np.mean(sig), sig, 0)
+sig_high = np.delete(sig_high, np.argwhere(sig_high==0))
 
-samples, averages_haut = increasing_sampling(sig_haut, (1, 5000, 100))
-samples, averages_bas = increasing_sampling(sig_bas, (1, 5000, 100))
+sig_low = np.where(sig < np.mean(sig), sig, 0)
+sig_low = np.delete(sig_low, np.argwhere(sig_low==0))
 
-##fig, (ax0, ax1, ax2, ax3) = plt.subplots(3, 1, layout='constrained')
+samples, standard_deviations_high = increasing_sampling(sig_high, (10, 5000, 10))
+samples, standard_deviations_low = increasing_sampling(sig_low, (10, 5000, 10))
+
 
 ax0 = plt.subplot(331)
-ax0.hist(sig_haut)
+ax0.hist(sig_high)
 ax0.set_xlim(3.2, 3.35)
 ax0.set_xlabel('Signal [V]')
 ax0.set_ylabel('Nombre de mesure []')
 
 ax1 = plt.subplot(333)
 ax1.set_xlim(-0.05, 0.05)
-ax1.hist(sig_bas)
+ax1.hist(sig_low)
 ax1.set_xlabel('Signal [V]')
 ax1.set_ylabel('Nombre de mesure []')
 
 ax2 = plt.subplot(312)
-ax2.scatter(samples, averages_haut)
+
+ax2.scatter(samples, standard_deviations_high, s=1)
 ax2.set_xlabel('Nombre de mesure []')
 ax2.set_ylabel('Moyenne [V]')
 
 ax3 = plt.subplot(313)
-ax3.scatter(samples, averages_bas)
+ax3.scatter(samples, standard_deviations_low, s=1)
 ax3.set_xlabel('Nombre de mesure []')
 ax3.set_ylabel('Moyenne [V]')
 
