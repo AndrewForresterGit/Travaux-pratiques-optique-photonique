@@ -1,7 +1,5 @@
 import csv
 import numpy as np
-from scipy import signal
-##from scipy.fft import fft, fftfreq
 import matplotlib.pyplot as plt
 
 
@@ -18,66 +16,52 @@ def get_csv_data(filepath):
             sig2.append(float(data[2]))
     return t, sig1, sig2
 
-def weighted_average(sig1, sig2, state, samples):
-    if state == 'haut':
-        expression = lambda x: sig2[x] > (max(sig2)+min(sig2))/2
-    else:
-        expression = lambda x: sig2[x] < (max(sig2)+min(sig2))/2
-    summed_sig = []
-    for i, data in enumerate(sig1):
-        if len(summed_sig) == samples:
-            return sum(summed_sig)/len(summed_sig)
-        if expression(i):
-            summed_sig.append(data)
-            
-    print(len(summed_sig))
-    return sum(summed_sig)/len(summed_sig)
-
-def increasing_sampling(sig1, sig2):
-    samples = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 5092]
-    averages_haut = []
-    averages_bas = []
-    
+def increasing_sampling(sig, sampling_range):
+    samples = [i for i in range(*sampling_range)]
+    averages = []
     for i in samples:
-        averages_haut.append(weighted_average(sig1, sig2, 'haut', i))
-        averages_bas.append(weighted_average(sig1, sig2, 'bas', i))
+        sample_sig = sig[0:i]
+        averages.append(sum(sample_sig)/len(sample_sig))
 
-    return samples, averages_haut, averages_bas
+    return samples, averages
 
 data_path = 'donnees/scope_total.csv'
 
 t, sync, sig = get_csv_data(data_path)
-t = np.arange(0, len(sig), 1)
-samples, average_haut, average_bas = increasing_sampling(sig, sync)
-print(samples, '\n', average_haut, '\n', average_bas)
+sync = np.array(sync)
+sig = np.array(sig)
 
-plt.hist(samples, average_haut)
+sig_haut = np.trim_zeros(np.sort(
+    np.where(sig > (max(sig)+min(sig))/2, sig, 0)))
 
-##fig, (ax0, ax1, ax2) = plt.subplots(3, 1, layout='constrained')
+sig_bas = np.trim_zeros(np.sort(
+    np.where(sig < (max(sig)+min(sig))/2, sig, 0)))
 
-##b, a = signal.butter(1, 1000, 'lp', fs=10000, output='ba')
-##w, h = signal.freqs(b, a)
-##filtered = signal.filtfilt(b, a, sig)
+samples, averages_haut = increasing_sampling(sig_haut, (1, 5000, 100))
+samples, averages_bas = increasing_sampling(sig_bas, (1, 5000, 100))
 
-##ax0.plot(t, sig)
-##ax0.set_xlabel('Temps [s]')
-##ax0.set_ylabel('Signal bruité [V]')
-##
-##ax1.plot(t, sync)
-##ax1.set_xlabel('Temps [s]')
-##ax1.set_ylabel('Signal\n synchronisation [V]')
+##fig, (ax0, ax1, ax2, ax3) = plt.subplots(3, 1, layout='constrained')
 
-##ax2.plot()
+ax0 = plt.subplot(331)
+ax0.hist(sig_haut)
+ax0.set_xlim(3.2, 3.35)
+ax0.set_xlabel('Signal [V]')
+ax0.set_ylabel('Nombre de mesure []')
 
-##ax2.plot(t, filtered)
-##ax2.set_xlabel('Temps [s]')
-##ax2.set_ylabel('Signal filtré')
+ax1 = plt.subplot(333)
+ax1.set_xlim(-0.05, 0.05)
+ax1.hist(sig_bas)
+ax1.set_xlabel('Signal [V]')
+ax1.set_ylabel('Nombre de mesure []')
 
-##print('sans filtre:')
-##print(f"haut: {weighted_average(sig, sync, 'haut', 10000):.4f} V")
-##print(f"bas: {weighted_average(sig, sync, 'bas', 10000):.4f} V\n")
-##print('avec filtre :')
-##print(f"haut: {weighted_average(filtered, sync, 'haut'):.4f} V")
-##print(f"bas: {weighted_average(filtered, sync, 'bas'):.4f} V")
+ax2 = plt.subplot(312)
+ax2.scatter(samples, averages_haut)
+ax2.set_xlabel('Nombre de mesure []')
+ax2.set_ylabel('Moyenne [V]')
+
+ax3 = plt.subplot(313)
+ax3.scatter(samples, averages_bas)
+ax3.set_xlabel('Nombre de mesure []')
+ax3.set_ylabel('Moyenne [V]')
 
 plt.show()
