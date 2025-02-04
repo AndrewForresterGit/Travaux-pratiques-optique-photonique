@@ -30,6 +30,7 @@ def increasing_sampling(sig, sampling_range):
     return np.array(samples), np.array(standard_deviations), np.array(averages)
 
 data_path = 'donnees/scope_total.csv'
+data_path = "bruit\donnees\scope_total.csv"
 
 t, sig, sync = get_csv_data(data_path)
 t = np.arange(0, len(sig), 1)
@@ -70,4 +71,7 @@ ax3.set_title('Écart type du mode lambda')
 ax3.set_xlabel('Nombre de mesure [-]')
 ax3.set_ylabel('Écart type [V]')
 
+print(np.mean(sig_high))
+print(np.mean(sig_low))
+      
 plt.show()

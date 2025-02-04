@@ -1,0 +1,96 @@
+import csv
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def get_csv_data(filepath):
+    t, sig1, sig2 = [], [], []
+    with open(filepath) as f:
+        csv_reader = csv.reader(f, delimiter=',')
+
+        for i, data in enumerate(csv_reader):
+            if i < 2:  # Skip header
+                continue
+            t.append(float(data[0]))
+            sig1.append(float(data[1]))
+            sig2.append(float(data[2]))
+            
+    return np.array(t), np.array(sig1), np.array(sig2)
+
+def increasing_sampling(sig, sampling_range):
+    samples = list(range(*sampling_range))
+    standard_deviations = []
+    averages = []
+    for i in samples:
+        sample_sig = sig[:i]
+        standard_deviations.append(np.std(sample_sig))
+        averages.append(np.mean(sample_sig))
+
+    return np.array(samples), np.array(standard_deviations), np.array(averages)
+
+# Correction du chemin d'accès (Windows compatible)
+data_path = r"bruit\donnees\scope_total.csv"
+
+t, sig, sync = get_csv_data(data_path)
+t = np.arange(len(sig))
+
+sig_high = np.where(sync > np.mean(sync), sig, 0)
+sig_high = np.delete(sig_high, np.where(sig_high == 0)[0])  # Correction
+
+sig_low = np.where(sync < np.mean(sync), sig, 0)
+sig_low = np.delete(sig_low, np.where(sig_low == 0)[0])  # Correction
+
+samples, standard_deviations_high, averages_high = increasing_sampling(sig_high, (10, 5000, 10))
+samples, standard_deviations_low, averages_low = increasing_sampling(sig_low, (10, 5000, 10))
+
+# Création de la figure avec 6 subplots
+fig, axs = plt.subplots(3, 2, figsize=(12, 12))  # 3 lignes, 2 colonnes
+
+# Moyenne en fonction du nombre d’échantillons - Mode Expérience
+axs[0, 0].plot(samples, averages_high, color='blue')
+axs[0, 0].set_title('Moyenne (Mode Expérience)')
+axs[0, 0].set_xlabel('Nombre de mesures [-]')
+axs[0, 0].set_ylabel('Moyenne [V]')
+axs[0, 0].grid()
+
+# Moyenne en fonction du nombre d’échantillons - Mode Lambda
+axs[0, 1].plot(samples, averages_low, color='red')
+axs[0, 1].set_title('Moyenne (Mode Lambda)')
+axs[0, 1].set_xlabel('Nombre de mesures [-]')
+axs[0, 1].set_ylabel('Moyenne [V]')
+axs[0, 1].grid()
+
+# Écart-type en fonction du nombre d’échantillons - Mode Expérience
+axs[1, 0].plot(samples, standard_deviations_high, color='blue')
+axs[1, 0].set_title('Écart type (Mode Expérience)')
+axs[1, 0].set_xlabel('Nombre de mesures [-]')
+axs[1, 0].set_ylabel('Écart type [V]')
+axs[1, 0].grid()
+
+# Écart-type en fonction du nombre d’échantillons - Mode Lambda
+axs[1, 1].plot(samples, standard_deviations_low, color='red')
+axs[1, 1].set_title('Écart type (Mode Lambda)')
+axs[1, 1].set_xlabel('Nombre de mesures [-]')
+axs[1, 1].set_ylabel('Écart type [V]')
+axs[1, 1].grid()
+
+# Histogramme du signal - Mode Expérience
+axs[2, 0].hist(sig_high, bins=50, color='blue', alpha=0.7)
+axs[2, 0].set_title('Histogramme (Mode Expérience)')
+axs[2, 0].set_xlabel('Signal [V]')
+axs[2, 0].set_ylabel('Fréquence')
+
+# Histogramme du signal - Mode Lambda
+axs[2, 1].hist(sig_low, bins=50, color='red', alpha=0.7)
+axs[2, 1].set_title('Histogramme (Mode Lambda)')
+axs[2, 1].set_xlabel('Signal [V]')
+axs[2, 1].set_ylabel('Fréquence')
+
+# Ajustement automatique pour éviter le chevauchement
+plt.tight_layout()
+
+print("Moyenne sig_high:", np.mean(sig_high))
+print("Moyenne sig_low:", np.mean(sig_low))
+
+plt.show()
+
