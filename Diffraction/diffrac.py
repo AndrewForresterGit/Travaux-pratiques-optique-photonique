@@ -9,9 +9,9 @@ def analyze_diffraction_with_threshold(
     wavelength,
     L,
     n_minima=3,
-    intensity_threshold=0.5,
-    distance_points=10,
-    prominence_val=0.02
+    intensity_threshold=0.7,
+    distance_points=5,
+    prominence_val=0.01
 ):
     """
     Analyse le patron de diffraction et applique un seuil pour ignorer les minima non pertinents.
@@ -146,7 +146,7 @@ def analyze_diffraction_with_threshold(
                  fontsize=12, verticalalignment='top',
                  bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray'))
     
-    plt.grid(True)
+    plt.grid(False)
     plt.legend()
     plt.show()
     
