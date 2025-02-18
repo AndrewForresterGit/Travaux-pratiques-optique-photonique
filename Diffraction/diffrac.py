@@ -11,7 +11,8 @@ def analyze_diffraction_with_threshold(
     n_minima=3,
     intensity_threshold=0.7,
     distance_points=5,
-    prominence_val=0.01
+    prominence_val=0.02,
+    filename = "res"
 ):
     """
     Analyse le patron de diffraction et applique un seuil pour ignorer les minima non pertinents.
@@ -115,31 +116,31 @@ def analyze_diffraction_with_threshold(
     
     # 9) Tracé
     plt.figure(figsize=(8, 5))
-    plt.plot(x_m_centered, intensity_norm, label='Intensité normalisée')
-    plt.xlabel("Position (m) [centrée sur le maximum]")
-    plt.ylabel("Intensité relative")
-    plt.title("Patron de diffraction (avec seuil sur les minima)")
+    plt.scatter(x_m_centered, intensity_norm, s=1, label='Intensité normalisée')
+    plt.xlabel("Position [m]")
+    plt.ylabel("Intensité relative [-]")
+    #plt.title("Patron de diffraction (avec seuil sur les minima)")
     
     # Tracer tous les minima détectés (avant filtrage) en rouge
     # Pour montrer la différence, on peut faire un find_peaks(-intensity_norm) sans filtrage
     all_minima_indices, _ = find_peaks(-intensity_norm)
-    plt.plot(x_m_centered[all_minima_indices], intensity_norm[all_minima_indices],
-             'ro', label='Minima bruts')
+    #plt.plot(x_m_centered[all_minima_indices], intensity_norm[all_minima_indices],
+    #         'rs', label='Minima bruts')
     
     # Minima retenus (après filtrage)
     plt.plot(x_m_centered[minima_indices_filtered], intensity_norm[minima_indices_filtered],
-             'go', label='Minima filtrés')
+             'rs', markersize=4, label='Minima identifié')
     
     # Marquage distinct pour ceux utilisés (les n_minima de chaque côté)
-    if len(left_minima_indices) > 0:
-        plt.plot(x_m_centered[left_minima_indices], intensity_norm[left_minima_indices],
-                 'bs', markersize=8, label=f'{n_minima} minima (gauche)')
-    if len(right_minima_indices) > 0:
-        plt.plot(x_m_centered[right_minima_indices], intensity_norm[right_minima_indices],
-                 'ms', markersize=8, label=f'{n_minima} minima (droite)')
+    #if len(left_minima_indices) > 0:
+       # plt.plot(x_m_centered[left_minima_indices], intensity_norm[left_minima_indices],
+                 #'bs', markersize=8, label=f'{n_minima} minima (gauche)')
+    #if len(right_minima_indices) > 0:
+        #plt.plot(x_m_centered[right_minima_indices], intensity_norm[right_minima_indices],
+                 #'ms', markersize=8, label=f'{n_minima} minima (droite)')
     
     # Annoter la largeur estimée
-    if slit_width_estimate is not None:
+    if slit_width_estimate is None:
         plt.text(0.05, 0.95,
                  f"Largeur fente ≈ {slit_width_estimate:.3e} m",
                  transform=plt.gca().transAxes,
@@ -147,7 +148,10 @@ def analyze_diffraction_with_threshold(
                  bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray'))
     
     plt.grid(False)
+    #set.xlim()
+    plt.margins(0)
     plt.legend()
+    plt.savefig(filename, dpi=600, bbox_inches='tight')
     plt.show()
     
     return slit_width_estimate, x_m_centered, intensity_norm
