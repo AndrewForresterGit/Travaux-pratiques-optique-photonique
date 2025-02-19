@@ -9,9 +9,9 @@ def analyze_diffraction_with_threshold(
     wavelength,
     L,
     n_minima=3,
-    intensity_threshold=0.7,
-    distance_points=5,
-    prominence_val=0.01
+    intensity_threshold=0.5,
+    distance_points=10,
+    prominence_val=0.02
 ):
     """
     Analyse le patron de diffraction et applique un seuil pour ignorer les minima non pertinents.
@@ -146,7 +146,7 @@ def analyze_diffraction_with_threshold(
                  fontsize=12, verticalalignment='top',
                  bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray'))
     
-    plt.grid(False)
+    plt.grid(True)
     plt.legend()
     plt.show()
     
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     N = 1024
     x_pixels = np.linspace(0, N-1, N)
     pixel_to_m = 1e-6       # 1 pixel = 1 micron
-    wavelength = 650e-9     # 650 nm
+    wavelength = 650e-9     # 650 nm Rouge
     L = 1.0                 # 1 m
     a_true = 50e-6          # largeur de la fente
 
