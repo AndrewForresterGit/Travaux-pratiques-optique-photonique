@@ -29,6 +29,7 @@ def determine_maxima(scheme_dict, measure, screen_slit, longueur_onde):
     
     index = int(input('index du premier maximum: '))
     pos_peak_1 = peaks_pos[index]
+    print(f'distance du premier pique: {pos_peak_1:.3e} [m]')
     
     d = np.sqrt(pow(1/(pos_peak_1/screen_slit), 2) + 1)*longueur_onde
     print(f'distance d = {d:.3e} [m]')
@@ -47,9 +48,9 @@ def determine_maxima(scheme_dict, measure, screen_slit, longueur_onde):
     ax_display.set_xlabel(r"Position sur l'écran [m]")
     ax_display.set_ylabel(r"Intensité relative [-]")
 ##    ax_display.margins(0)
-##    plt.show()
+    plt.show()
     
-    fig_display.savefig("figures_interference/R_50_10.pdf", format="pdf")
+##    fig_display.savefig("figures_interference/R_50_10.pdf", format="pdf")
 
 
     return peaks_pos, peaks_int 
@@ -73,6 +74,6 @@ if __name__ == "__main__":
     data_V_50 = getcsvData_dict(fich_v_50_15) # indice=38, threshold=0
     data_R_50_10 = getcsvData_dict(fich_r_50_10) # indice=25, threshold=0
     
-    peak_pos, peak_int = determine_maxima(data_R_50_10, .1, .50, longueur_onde=rouge)
+    peak_pos, peak_int = determine_maxima(data_R_50_10, .1, .5, longueur_onde=rouge)
 
 ##    plt.show()
