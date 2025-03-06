@@ -32,5 +32,6 @@ l_onde = 650e-9 #Rouge
 
 penis = float(0.15/len(I))
 
-chose = swe(x, I, penis, l_onde, 0.5, 6, filename="test")
+chose = swe(x, I, penis, l_onde, 0.5, 5, filename="test")
+
 #print(chose[0])

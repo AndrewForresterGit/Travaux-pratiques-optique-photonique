@@ -10,7 +10,7 @@ NA = 0.12
 lambda_c = 620e-9   # Longueur d'onde de coupure (m)
 V_c = 2.4048     # V pour fibre mono
 
-#calculs de shit
+#calculs
 
 # rayon de la fibre
 a = (V_c * lambda_c) / (2*np.pi*(NA))
