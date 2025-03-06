@@ -1,103 +1,79 @@
-#!/usr/bin/env python3
 import numpy as np
+import matplotlib.ticker as tck
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 from getcsvData import getcsvData_dict
 
-def analyze_interference(intensity, conversion_factor, L, wavelength, prominence=0.05, plot_save=None):
-    """
-    Analyzes a 1D interference intensity profile and calculates the slit separation.
 
-    Parameters:
-        intensity (np.ndarray): 1D intensity array from Fiji.
-        conversion_factor (float): Meters per pixel.
-        L (float): Distance from slits to screen (in meters).
-        wavelength (float): Wavelength of the light in nm.
-        prominence (float): Prominence factor (fraction of max intensity) for peak detection.
-        plot_save (str or None): If provided, the plot is saved to this path.
+def determine_maxima(scheme_dict, measure, screen_slit, longueur_onde):
+    Distance_pixels, Gray_Value = scheme_dict.values()
+    
+    pos = np.array(Distance_pixels)
+    pos_fixed = np.arange(-measure/2, measure/2, measure/len(pos))
+    gray_scale = np.array(Gray_Value)
+    
+    # reperer les piques du schema
+    peaks = find_peaks(gray_scale, threshold=0)[0]
+    peaks_pos = np.zeros(len(peaks))
+    peaks_int = np.zeros(len(peaks))
+    
+    for i, j in enumerate(peaks):
+        peaks_pos[i] = pos_fixed[j]
+        peaks_int[i] = gray_scale[j]
 
-    Returns:
-        slit_separation (float or None): Calculated slit separation in meters.
-        avg_fringe_spacing (float or None): Average fringe spacing in meters.
-    """
-    # Create x-axis in physical units
-    x_pixels = np.arange(len(intensity))
-    x_physical = x_pixels * conversion_factor
+    # identifier visuellement le premier pique a partir du centre
+##    fig_ident, ax_ident = plt.subplots()
+##    ax_ident.scatter(pos_fixed, gray_scale, s=1)
+##    ax_ident.scatter(peaks_pos, peaks_int)
+##    plt.show()
+    
+    index = int(input('index du premier maximum: '))
+    pos_peak_1 = peaks_pos[index]
+    print(f'distance du premier pique: {pos_peak_1:.3e} [m]')
+    
+    d = np.sqrt(pow(1/(pos_peak_1/screen_slit), 2) + 1)*longueur_onde
+    print(f'distance d = {d:.3e} [m]')
 
-    # Set peak prominence based on the maximum intensity
-    peak_prominence = prominence * np.max(intensity)
+    fig_display, ax_display = plt.subplots()
+    
+    ax_display.axvline(x=peaks_pos[index], color='red', linestyle=':', linewidth=1)
+    ax_display.scatter(pos_fixed, gray_scale/gray_scale.max(), s=1)
+##    xmin, xmax = ax_display.get_xlim()
+##    ax_display.hlines(y=peaks_int[index]/gray_scale.max(), xmin=xmin, xmax=xmax, color='red', linestyle='-', linewidth=1)
+    ax_display.scatter(peaks_pos[index], peaks_int[index]/gray_scale.max(), color='green', marker='s')
 
-    # Detect maxima and minima using find_peaks.
-    peaks, _ = find_peaks(intensity, prominence=peak_prominence)
-    valleys, _ = find_peaks(-intensity, prominence=peak_prominence)
-
-    # Plot the intensity profile with detected points.
-    plt.figure(figsize=(10, 6))
-    plt.plot(x_physical, intensity, label="Intensity", color="blue")
-    plt.scatter(x_physical[peaks], intensity[peaks], color="red", marker="o", label="Maxima")
-    plt.scatter(x_physical[valleys], intensity[valleys], color="green", marker="x", label="Minima")
-    plt.xlabel("Distance (m)")
-    plt.ylabel("Intensity (a.u.)")
-    plt.title("Double-Slit Interference Pattern")
-    plt.legend()
-
-    # Calculate the average fringe spacing and slit separation if enough peaks are detected.
-    if len(peaks) < 2:
-        print("Not enough maxima detected to calculate fringe spacing.")
-        avg_fringe_spacing = None
-        slit_separation = None
-    else:
-        fringe_spacings = np.diff(x_physical[peaks])
-        avg_fringe_spacing = np.mean(fringe_spacings)
-        print(f"Average fringe spacing: {avg_fringe_spacing:.4e} m")
-
-        # Convert wavelength from nm to m.
-        wavelength_m = wavelength * 1e-9
-
-        # Using the formula: d = (λ L) / Δx, where Δx is the fringe spacing.
-        slit_separation = (wavelength_m * L) / avg_fringe_spacing
-        print(f"Calculated slit separation: {slit_separation:.4e} m")
-
-        # Annotate the plot with the slit separation.
-        plt.text(
-            0.05, 0.95,
-            f"Slit separation: {slit_separation:.2e} m",
-            transform=plt.gca().transAxes,
-            verticalalignment="top",
-            bbox=dict(facecolor="white", alpha=0.6)
-        )
-
-    # Save the plot if a file path is provided.
-    if plot_save:
-        plt.savefig(plot_save)
-        print(f"Plot saved to {plot_save}")
-
+    # formatage du graphique
+    ax_display.xaxis.set_minor_locator(tck.AutoMinorLocator())
+    ax_display.yaxis.set_minor_locator(tck.AutoMinorLocator())
+    ax_display.set_xlabel(r"Position sur l'écran [m]")
+    ax_display.set_ylabel(r"Intensité relative [-]")
+##    ax_display.margins(0)
     plt.show()
-    return slit_separation, avg_fringe_spacing
+    
+##    fig_display.savefig("figures_interference/R_50_10.pdf", format="pdf")
 
-def main():
-    # ----- Set Your Parameters Here -----
-    input_file = "slice.npy"         # Path to your NumPy file containing a 1D intensity array.
-    input =
-    conversion_factor = 1e-6           # Conversion factor: meters per pixel.
-    L = 1.0                          # Distance from slits to screen in meters.
-    wavelength = 650                 # Wavelength in nm (use 650 or 632, etc.).
-    prominence = 0.05                # Prominence factor for peak detection.
-    plot_save = "interference_plot.png"  # File name to save the plot (or set to None).
 
-    # ----- Load the intensity profile -----
-##    try:
-##        intensity = np.load(input_file)
-##    except Exception as e:
-##        print(f"Error loading file {input_file}: {e}")
-    return
-
-    if intensity.ndim != 1:
-        print("Error: The input NumPy array must be a 1D intensity profile.")
-        return
-
-    # ----- Analyze the interference pattern -----
-    analyze_interference(intensity, conversion_factor, L, wavelength, prominence, plot_save)
+    return peaks_pos, peaks_int 
 
 if __name__ == "__main__":
-    main()
+    '''
+    ---longueurs d'ondes---
+    laser vert: 535 [nm]
+    laser rouge: 650 [nm]
+    '''
+    vert = 535e-9
+    rouge = 650e-9
+    
+    fich_v_100_15 = '_two_SLIT/v_double_1m_15cm.csv'
+    fich_v_75_15 = '_two_SLIT/V_0.75m_15cm.csv'
+    fich_v_50_15 = '_two_SLIT/V_0.5_15cm.csv'
+    fich_r_50_10 = '_two_SLIT/R_0.5_10cm.csv'
+
+    data_V_100 = getcsvData_dict(fich_v_100_15) # indice=5, threshold=1
+    data_V_75 = getcsvData_dict(fich_v_75_15) # indice=29, threshold=0
+    data_V_50 = getcsvData_dict(fich_v_50_15) # indice=38, threshold=0
+    data_R_50_10 = getcsvData_dict(fich_r_50_10) # indice=25, threshold=0
+    
+    peak_pos, peak_int = determine_maxima(data_R_50_10, .1, .5, longueur_onde=rouge)
+
+##    plt.show()

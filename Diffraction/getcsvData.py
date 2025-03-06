@@ -33,6 +33,7 @@ def getcsvData_dict(filePath):
     return data
 
 if __name__ == '__main__':
-    x = getcsvData_dict('Electronique\Lab5\Data(5)\scope_5.csv')
-    print(x)
-    print(x.keys())
+##    x = getcsvData_dict('Electronique\Lab5\Data(5)\scope_5.csv')
+##    print(x)
+##    print(x.keys())
+    pass
