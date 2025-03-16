@@ -1,4 +1,4 @@
-const int ledPin = 9;  // Pin de la LED
+const int ledPin = 13;  // Pin de la LED
 const int receive_pin = 54; // Pin 54 -> A0
 
 const int frequency = 500; // Frequency in Hertz
