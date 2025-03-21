@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 ser = serial.Serial('/dev/cu.usbmodem14101', 250000, timeout=100)
 
 print("start")
-iterations = 10000
+iterations = 20000
 i = 0
 arr = np.zeros(iterations)
 temps = np.zeros(iterations)
@@ -20,8 +20,8 @@ print("done")
 print(delta)
 temps=np.linspace(0, delta, iterations)
 
-np.save('tension_baud_test_38400.npy', arr)
-np.save('temps_baud_test_38400.npy', temps)
+np.save('tension_image_baud_test_9600.npy', arr)
+np.save('tension_image_baud_test_9600.npy', temps)
 plt.plot(temps, arr)
 plt.scatter(temps, arr, s=2)
 ##plt.savefig(test.pdf)
