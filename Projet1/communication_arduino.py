@@ -21,7 +21,7 @@ print(delta)
 temps=np.linspace(0, delta, iterations)
 
 np.save('tension_image_baud_test_9600.npy', arr)
-np.save('tension_image_baud_test_9600.npy', temps)
+np.save('temps_image_baud_test_9600.npy', temps)
 plt.plot(temps, arr)
 plt.scatter(temps, arr, s=2)
 ##plt.savefig(test.pdf)

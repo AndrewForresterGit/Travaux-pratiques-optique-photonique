@@ -1,4 +1,3 @@
-#! venv/venv_projet1/bin/python3.12
 import cv2
 ##from PIL import Image
 ##from sklearn.preprocessing import normalize
