@@ -17,11 +17,6 @@ def compress(image):
     return image[center_x-size//2:center_x+size//2+1,
                  center_y-size//2:center_y+size//2+1]
 
-def save_bytes(image):
-    byte_arr = []
-    string = ""
-    for row in image:
-        string += f'{row}'
 
 def norm_im(image):
     normed = cv2.normalize(image, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
@@ -29,7 +24,7 @@ def norm_im(image):
 
 
 def main() -> None:
-    fichier_im = "locked_in.jpg"
+    fichier_im = "raw_data/img/locked_in.jpg"
     im_data = fichier_im.partition('.')
     save_file = f"{im_data[0]}_compressed.{im_data[2]}"
 
@@ -55,8 +50,6 @@ def main() -> None:
             string += f'{int(j)}*'
         print(string[:-1] + '\\n')
     
-##    save_bytes(im_compressed)
-##    print(im_compressed)
     plt.show()
 
 if __name__ == "__main__":
