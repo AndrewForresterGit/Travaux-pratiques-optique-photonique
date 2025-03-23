@@ -1,7 +1,7 @@
 const int ledPin = 9;        // Pin de la LED
 const int receive_pin = 54;  // Pin 54 -> A0
 
-const int frequency = 500;  // Frequency in Hertz
+const int frequency = 10;  // Frequency in Hertz
 const int sample_freq = 100 * frequency;
 const int period = 1000 / frequency;  // period in ms
 int sample_per = 1000 / sample_freq;  // period in ms
@@ -12,7 +12,7 @@ const float seuil_3V = 3.3 / 5.0 * 256;  // Seuil analogique (pour le analogue r
 const byte syncSignal = 0b10101010;  // Signal de synchronisation en binaire
 const byte endSignal = 0b11001011;   // Signal de fin du packet (not used rn)
 const int max_len_per_pac = 64;      // Longueur de message maximale par packets
-bool message_sent = false;
+bool message_sent = true;
 int packet_count, last_packet_size;
 
 const int repeatCount = 1;  // Nombre de fois que le message sera envoyé
@@ -23,8 +23,8 @@ const byte image[] = { 0x89, 0x50, 0x4e, 0x47 };
 byte data_type, data_len, packet_number, total_number_of_packets;
 
 void setup() {
-  Serial.begin(115200);
-  analogReadResolution(8);
+  Serial.begin(9600);
+  //analogReadResolution(8);
   pinMode(ledPin, OUTPUT);
 }
 
@@ -144,7 +144,10 @@ void loop() {
   // Par contre là, après on peut soit juste sample à la fréquence qu'on a identifié, ou on sample à un multiple de cette fréquence, puis on fait ce que ludo m'a montré
   // Aka de expect genre 10 +/- 1 bit pour chaque, de compter le nombre avant changement, et de déduire si c'est 1 ou + de bit. idk tho wtv.
 
-  interp_header(data_type, data_len, packet_number, total_number_of_packets);
+  while (Serial.available()) {
+    Serial.println(read_bool());
+    }
+  //interp_header(data_type, data_len, packet_number, total_number_of_packets);
   // Blablabla continuer à capter le
 }
 
