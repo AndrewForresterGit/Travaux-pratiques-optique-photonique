@@ -44,12 +44,14 @@ for i in range(len(array_tension)):
     y_min = ax[i].get_ylim()[0]
     ax[i].text(2775, y_min + 0.1, f'{speed_list[i]} baud', fontsize=10, ha='right', va='bottom', color='black')
 
-ax[3].set_ylabel("Intensité relative [-]")
+ax[3].set_ylabel("Tension [V]")
 #ax[-1].set_xlabel("Temps ajusté [ms]")  # Ajoute le label seulement au dernier subplot
 plt.tight_layout()
-plt.xlabel("Tension [V]")
+#plt.ylabel("Tension [V]")
 #plt.ylabel("Intensité relative [-]")
+plt.xlabel("Temps normalisé [-]")
 plt.xlim((0, 2800))
+plt.xticks([])
 #plt.ylim((-0.2, 5.5))
 fig.subplots_adjust(hspace=0.2)
 plt.legend()
