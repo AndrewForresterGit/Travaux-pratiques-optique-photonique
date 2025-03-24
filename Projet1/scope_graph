@@ -1,0 +1,58 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from getcsvData import getcsvData_dict
+
+speed_list = [300, 600, 1200, 4800, 9600, 19200, 38400]
+#speed_list = [9600, 19200, 38400]
+#time_factor = [1, 1, 0.8, 1.6, 1.7, 2, 2]
+time_factor = [1, 1, 0.8, 3.2, 6.55, 3.5, 2.8]
+def gen_data(speed, time_fac):
+    data_dir = 'raw_data'
+    speed_test = 'speed_test/scope'
+    experience_type = speed_test    
+    path = f'Travaux-pratiques-optique-photonique/Projet1/{data_dir}/{experience_type}/F{speed}.CSV'
+    #return (np.loadtxt(path, delimiter=",", skiprows=18, usecols=(4)), np.loadtxt(path, delimiter=",", skiprows=1, usecols=1, max_rows=1))
+    return (np.loadtxt(path, delimiter=",", skiprows=18, usecols=(4))/10, time_fac)
+
+data = [gen_data(speed, tf) for speed, tf in zip(speed_list, time_factor)]
+array_tension = np.array([d[0] for d in data])
+sample_time = np.array([d[1] for d in data])
+array_time = [np.linspace(0, len(t) * dt, len(t)) for t, dt in zip(array_tension, sample_time)]
+
+
+def find_drop_time(time, tension, i):
+    coupe = [598, 553, 222, 467, 369, 829, 805]
+    drop_index = coupe[i]
+
+    return time[drop_index]
+
+drop_times = [find_drop_time(array_time[i], array_tension[i], i) for i in range(len(array_tension))]
+min_drop_time = min(drop_times)  # Temps de référence pour l'alignement
+
+# Ajuster les temps pour aligner les signaux
+adjusted_time = [array_time[i] - (drop_times[i] - min_drop_time) for i in range(len(array_tension))]
+
+fig, ax = plt.subplots(len(array_tension), 1, figsize=(5, 7), sharex=True)
+
+markers = ['o', 's', '^', 'v', 'D', '*', '+']
+#plt.ylabel("Intensité relative [-]")
+for i in range(len(array_tension)):
+    ax[i].scatter(adjusted_time[i], array_tension[i], s=1, color="black")
+    ax[i].set_ylim((-0.2, 5.5))
+
+    # Ajouter le texte du baud rate à x = 2500
+    y_min = ax[i].get_ylim()[0]
+    ax[i].text(2775, y_min + 0.1, f'{speed_list[i]} baud', fontsize=10, ha='right', va='bottom', color='black')
+
+ax[3].set_ylabel("Intensité relative [-]")
+#ax[-1].set_xlabel("Temps ajusté [ms]")  # Ajoute le label seulement au dernier subplot
+plt.tight_layout()
+plt.xlabel("Tension [V]")
+#plt.ylabel("Intensité relative [-]")
+plt.xlim((0, 2800))
+#plt.ylim((-0.2, 5.5))
+fig.subplots_adjust(hspace=0.2)
+plt.legend()
+plt.savefig("graph.svg", format="svg", bbox_inches="tight")
+plt.show()
+
