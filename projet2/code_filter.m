@@ -1,59 +1,75 @@
-load('dat_440hz.mat'); 
+load('vivaldi_2point_contact.mat');
 t = moku.data(:,1);
-v = moku.data(:, 2);
+v = moku.data(:,2);
 
-%% Paramètres d'échantillonnage
-% Calcul de la fréquence d'échantillonnage
-f = 1 / (t(2) - t(1)); 
-fprintf('Fréquence d''échantillonnage: %.2f Hz\n', f);
+% 1) Paramètres d'échantillonnage
+fs = 1 / (t(2) - t(1));
+fprintf('Fréquence d''échantillonnage: %.2f Hz\n', fs);
+N  = length(v);
 
-%% Conception d'un filtre passe-bande Butterworth
-low_cutoff  = 100;    % par exemple, 20 Hz
-high_cutoff = 3000; % par exemple, 20 kHz (vérifiez que cela correspond à votre système)
+% 2) Suppression du DC / detrend
+v = v - mean(v);
+% v = detrend(v);
 
-% Ordre du filtre
-order = 4; 
+% 3) Conception du filtre passe-bande
+low_cutoff  = 200;
+high_cutoff = 5000;
+order       = 4;
+[b, a]      = butter(order, [low_cutoff, high_cutoff]/(fs/2), 'bandpass');
 
-% Conception du filtre
-[b, a] = butter(order, [low_cutoff, high_cutoff] / (f/2), 'bandpass');
-
-%% Application du filtre
-
+% 4) Application du filtre
 voltage_filtered = filtfilt(b, a, v);
-%voltage_filtered = v;
 
-FFT_signal = fft(v);
+% 5) FFT et normalisation
+FFT_signal          = fft(v)/N;
+FFT_signal_filtered = fft(voltage_filtered)/N;
 
-FFT_signal_filtered = fft(voltage_filtered);
+% Axe fréquentiel complet
+f = (0:N-1)*(fs/N);
 
-%% Affichage des résultats
+% 6) Affichage
 figure;
-subplot(4,1,1)
-plot(t, v, 'b');
-title('Signal brut');
+
+subplot(2,2,1)
+plot(t, v);
+title('Signal brut (DC enlevé)');
 xlabel('Temps (s)');
 ylabel('Tension (V)');
 grid on;
 
-subplot(4,1,2)
-plot(t, voltage_filtered, 'r');
-title('Signal filtré');
+subplot(2,2,2)
+plot(t, voltage_filtered);
+title('Signal filtré 200–300 Hz');
 xlabel('Temps (s)');
 ylabel('Tension (V)');
 grid on;
 
-subplot(4,1,3)
-plot(f, abs(FFT_signal));
+half = floor(N/2);
+subplot(2,2,3)
+plot(f(1:half), abs(FFT_signal(1:half)));
 title('Spectre du signal mesuré');
 xlabel('Fréquence (Hz)');
-ylabel('Amplitude');
+ylabel('Amplitude (V)');
 grid on;
+xlim([0 20000]); 
+set(gca, 'XScale', 'log');  
+set(gca, 'YScale', 'log');
 
-subplot(4,1,4)
-plot(f, abs(FFT_signal_filtered));
+
+subplot(2,2,4)
+set(gca, 'XScale', 'log'); 
+set(gca, 'YScale', 'log');
+plot(f(1:half), abs(FFT_signal_filtered(1:half)));
 title('Spectre du signal filtré');
 xlabel('Fréquence (Hz)');
-ylabel('Amplitude');
+ylabel('Amplitude (V)');
+xlim([low_cutoff high_cutoff]);  
 grid on;
+set(gca, 'XScale', 'log');  
+set(gca, 'YScale', 'log');
 
-audiowrite("test_440.wav", v, round(f));
+% 7) Sauvegarde audio (normalisation si besoin)
+v_norm = v / max(abs(v));
+v_filt = voltage_filtered / max(abs(voltage_filtered));
+audiowrite("vivaldi_2point_contact-2pt.wav", v_norm, round(fs));
+audiowrite("vivaldi_2point_contactfilt.wav", v_filt, round(fs));

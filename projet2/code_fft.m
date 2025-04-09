@@ -1,9 +1,10 @@
 % Load recording
-load('mozzart_2.mat'); 
+load('chanson_stephanie.mat'); 
 t = moku.data(:,1);
 v = moku.data(:, 2);
 % Load noise
-load('noise_20s_real.mat');
+addpath('Non-classé')
+load('noise_25s.mat');
 t_dark = moku.data(:,1);
 v_dark = moku.data(:, 2);
 
@@ -16,12 +17,12 @@ N = length(v);
 FFT_signal = fft(v);
 FFT_dark   = fft(v_dark);
 
-FFT_net = FFT_signal - 1.1*FFT_dark;
+FFT_net = FFT_signal - FFT_dark;
 v_cleaned = real(ifft(FFT_net));
 
 %% Conception d'un filtre passe-bande Butterworth
-low_cutoff  = 400;    % par exemple, 20 Hz
-high_cutoff = 4000; % par exemple, 20 kHz (vérifiez que cela correspond à votre système)
+low_cutoff  = 50;    % par exemple, 20 Hz
+high_cutoff = 10000; % par exemple, 20 kHz (vérifiez que cela correspond à votre système)
 
 % Ordre du filtre
 order = 4; 
@@ -78,4 +79,4 @@ title('Spectre du signal nettoyé');
 xlabel('Fréquence (Hz)');
 ylabel('Amplitude');
 grid on;
-%audiowrite("mozzzzz6_filt.wav", v_filtered, round(fs));
+audiowrite("stephanie_fft_nofilter.wav", v_filtered, round(fs));
