@@ -30,7 +30,8 @@ def main() -> None:
     subdir = "raw_mokugo/manual_freq_sweep"
     sample_rate = 40e3
 
-    files = glob(f"{subdir}/*.npy")
+##    files = glob(f"{subdir}/*.npy")
+    files = ["raw_mokugo/freq_sweep_100-10k-30s.npy"]
 
     for file in files:
         save_file = file.replace("raw_mokugo", "preprocessed")

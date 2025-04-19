@@ -19,8 +19,7 @@ def fourier(audio, sample_rate):
     yf = fft(audio)
     xf = fftfreq(length, 1/sample_rate)[:length//2]
 
-    plt.plot(xf, 2.0/length * np.abs(yf[0:length//2]))
-    plt.show()
+    return xf, 2.0/length * np.abs(yf[0:length//2])
     
 def main() -> None:
 
@@ -29,29 +28,41 @@ def main() -> None:
     os.chdir("../donnees")
     print(f"changed dir to {os.getcwd()}")
 
-    subdir = "preprocessed/manual_freq_sweep"
+##    subdir = "preprocessed/manual_freq_sweep"
     sample_rate = 40e3
 
-    files = glob(f"{subdir}/*.wav")
-    for file in files:
-        title = file.split('_')[-1].split('.')[0]
-        freq = float(title)
-        print(freq)
+    freqs = []
+    amps = []
+
+##    files = glob(f"{subdir}/*.wav")
+    file = "preprocessed/freq_sweep_100-10k-30s.wav"
     
-        a = read(file)
-        audio = np.array(a[1], dtype=float)
-        fourier(audio, sample_rate)
+    a = read(file)
+    audio = np.array(a[1], dtype=float)
+    f, t, Sxx = signal.spectrogram(audio, fs=sample_rate)
+##    plt.specgram(audio, Fs=sample_rate)
+##    plt.show()
 
 
-##        fig = plt.figure()
-##       
-##        ax1 = fig.add_subplot(211)
-##        ax1.set_title(title)
-##        ax1.specgram(audio, NFFT=1024, Fs=sample_rate)
+    fig = plt.figure()
+
+    ax = fig.add_subplot()#projection='3d')
+##    X, Y = np.meshgrid(f, t, indexing='ij')
+    amps = np.apply_along_axis(np.max, 1, Sxx)
+    print(amps.shape)
+
+    plt.loglog(f, amps)
+
+##    ax.plot_surface(X, Y, Sxx, cmap='viridis')
+##   
+##    ax1 = fig.add_subplot(211)
+##    ax1.set_title(title)
+##    ax1.specgram(audio, NFFT=1024,s Fs=sample_rate)
 ##
-##        ax2 = fig.add_subplot(212)
-##        ax2.magnitude_spectrum(audio, Fs=sample_rate, scale='dB', color='C1')
-##        plt.show()
+##    ax2 = fig.add_subplot(212)
+##    ax2.magnitude_spectrum(audio, Fs=sample_rate, scale='dB', color='C1')
+    plt.show()
+
     
 if __name__ == "__main__":
     main()
