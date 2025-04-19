@@ -35,25 +35,30 @@ def main() -> None:
     amps = []
 
 ##    files = glob(f"{subdir}/*.wav")
-    file = "preprocessed/freq_sweep_100-10k-30s.wav"
+    # dark
+    file1 = pass
+    # vitre
+    file2 = "preprocessed/freq_sweep_100-10k-30s.wav"
+    # petit plexiglass
+    file3 = "Plexigalss/small_plexi_100-10000_30s_sweep_with_smoll.wav"
     
-    a = read(file)
+    a = read(file1)
     audio = np.array(a[1], dtype=float)
     f, t, Sxx = signal.spectrogram(audio, fs=sample_rate)
-##    plt.specgram(audio, Fs=sample_rate)
-##    plt.show()
+    plt.specgram(audio, Fs=sample_rate)
+    plt.show()
 
 
     fig = plt.figure()
 
     ax = fig.add_subplot()#projection='3d')
-##    X, Y = np.meshgrid(f, t, indexing='ij')
+    X, Y = np.meshgrid(f, t, indexing='ij')
     amps = np.apply_along_axis(np.max, 1, Sxx)
-    print(amps.shape)
+##    print(amps.shape)
 
-    plt.loglog(f, amps)
+    plt.semilogx(f, 20*np.log(amps/np.max(amps)))
 
-##    ax.plot_surface(X, Y, Sxx, cmap='viridis')
+##    ax.plot_surface(X, Y, 20*np.log(Sxx), cmap='viridis')
 ##   
 ##    ax1 = fig.add_subplot(211)
 ##    ax1.set_title(title)
