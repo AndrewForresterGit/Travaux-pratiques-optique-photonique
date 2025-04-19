@@ -36,7 +36,7 @@ def main() -> None:
 
 ##    files = glob(f"{subdir}/*.wav")
     # dark
-    file1 = pass
+    file1 = 
     # vitre
     file2 = "preprocessed/freq_sweep_100-10k-30s.wav"
     # petit plexiglass
