@@ -1,4 +1,4 @@
-load('vivaldi_2point_contact.mat');
+load('phone_sur_table.mat');
 t = moku.data(:,1);
 v = moku.data(:,2);
 
@@ -12,8 +12,8 @@ v = v - mean(v);
 % v = detrend(v);
 
 % 3) Conception du filtre passe-bande
-low_cutoff  = 200;
-high_cutoff = 5000;
+low_cutoff  = 100;
+high_cutoff = 4000;
 order       = 4;
 [b, a]      = butter(order, [low_cutoff, high_cutoff]/(fs/2), 'bandpass');
 
@@ -71,5 +71,5 @@ set(gca, 'YScale', 'log');
 % 7) Sauvegarde audio (normalisation si besoin)
 v_norm = v / max(abs(v));
 v_filt = voltage_filtered / max(abs(voltage_filtered));
-audiowrite("vivaldi_2point_contact-2pt.wav", v_norm, round(fs));
-audiowrite("vivaldi_2point_contactfilt.wav", v_filt, round(fs));
+audiowrite("phone_sur_table.wav", v_norm, round(fs));
+audiowrite("phone_sur_table_filt.wav", v_filt, round(fs));

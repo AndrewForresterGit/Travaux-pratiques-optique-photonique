@@ -1,5 +1,5 @@
 % Load recording
-load('chanson_stephanie.mat'); 
+load('vitre_stephanie.mat'); 
 t = moku.data(:,1);
 v = moku.data(:, 2);
 % Load noise
