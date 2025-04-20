@@ -7,10 +7,10 @@ Description: ...
 import os
 import wave
 from glob import glob
-import numpy as np
 from scipy import signal
 from scipy.fft import fft, fftfreq
 from scipy.io.wavfile import read
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -20,41 +20,44 @@ def fourier(audio, sample_rate):
     xf = fftfreq(length, 1/sample_rate)[:length//2]
 
     return xf, 2.0/length * np.abs(yf[0:length//2])
+
+def 
     
 def main() -> None:
+    """analyses of the data for project 2"""
 
     # move into data directory
     print(f"ran from {os.getcwd()}")
-    os.chdir("../donnees")
+    os.chdir("../donnees/preprocessed")
     print(f"changed dir to {os.getcwd()}")
 
-##    subdir = "preprocessed/manual_freq_sweep"
+    # include sampling rates ...
     sample_rate = 40e3
 
-    freqs = []
-    amps = []
+    # petit plexiglass (1)
+    sweep1 = "preprocessed/petit_plexi/sweep1"
 
-##    files = glob(f"{subdir}/*.wav")
-    # dark
-    file1 = 
-    # vitre
-    file2 = "preprocessed/freq_sweep_100-10k-30s.wav"
-    # petit plexiglass
-    file3 = "Plexigalss/small_plexi_100-10000_30s_sweep_with_smoll.wav"
+    # moyen plexiglass (2)
+    sweep2 = "preprocessed/moyen_plexi/sweep2"
+    
+    noise2 = "preprocessed/moyen_plexi/noise2"
+
+    # grosse vitre (3)
+    sweep3 = "preprocessed/grosse_vitre/sweep3"
+    
+    noise3 = "preprocessed/grosse_vitre/noise3"
     
     a = read(file1)
     audio = np.array(a[1], dtype=float)
     f, t, Sxx = signal.spectrogram(audio, fs=sample_rate)
-    plt.specgram(audio, Fs=sample_rate)
-    plt.show()
-
+##    plt.specgram(audio, Fs=sample_rate)
+##    plt.show()
 
     fig = plt.figure()
 
-    ax = fig.add_subplot()#projection='3d')
-    X, Y = np.meshgrid(f, t, indexing='ij')
+##    ax = fig.add_subplot()#projection='3d')
+##    X, Y = np.meshgrid(f, t, indexing='ij')
     amps = np.apply_along_axis(np.max, 1, Sxx)
-##    print(amps.shape)
 
     plt.semilogx(f, 20*np.log(amps/np.max(amps)))
 

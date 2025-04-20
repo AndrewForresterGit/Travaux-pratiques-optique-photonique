@@ -34,7 +34,7 @@ def reshape(data):
 def make_wave(data):
     return (data[1].T * (2**15 - 1)).astype("<h")
 
-def preprocess(file: str, save_file: str):
+def preprocess(file: str, save_file: str, sample_rate: int):
     """
     files must have .mat or .npy extension
     saves file as a .npy and .wav
@@ -47,6 +47,7 @@ def preprocess(file: str, save_file: str):
 
     # save npy
     np.save(save_file + ".npy", data)
+    print(f"{file} save at {save_file + ".npy"}")
 
     # save wav
     with wave.open(save_file + ".wav", "w") as f:
@@ -55,6 +56,7 @@ def preprocess(file: str, save_file: str):
         f.setsampwidth(2)
         f.setframerate(sample_rate)
         f.writeframes(audio.tobytes())
+    print(f"{file} save at {save_file + ".wav"}\n")
 
     return None
 
@@ -68,6 +70,7 @@ def main() -> None:
     print(f"changed dir to {os.getcwd()}")
 
     # include sampling rates ...
+    sample_rate = 40e3
 
     # petit plexiglass (1)
     sweep1 = "non_classe/sweep_with_smoll.mat"
@@ -92,7 +95,7 @@ def main() -> None:
              (sweep3, sweep3_save), (noise3, noise3_save)]
 
     for i in tests:
-        preprocess(*i)
+        preprocess(*i, sample_rate)
 
 if __name__ == "__main__":
     main()
