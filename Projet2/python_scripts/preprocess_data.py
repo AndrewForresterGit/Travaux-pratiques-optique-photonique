@@ -94,8 +94,14 @@ def main() -> None:
              (sweep2, sweep2_save), (noise2, noise2_save),
              (sweep3, sweep3_save), (noise3, noise3_save)]
 
-    for i in tests:
-        preprocess(*i, sample_rate)
+    # cellophane
+    sweep = "raw_mokugo/cello/cello_sweep_std.npy"
+    sweep_save = "preprocessed/cello/cello_sweep_std"
+
+    preprocess(sweep, sweep_save, sample_rate)
+
+##    for i in tests:
+##        preprocess(*i, sample_rate)
 
 if __name__ == "__main__":
     main()

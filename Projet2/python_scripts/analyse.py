@@ -21,7 +21,14 @@ def fourier(audio, sample_rate):
 
     return xf, 2.0/length * np.abs(yf[0:length//2])
 
-def 
+def audio(file):
+    a = read(sweep2 + '.wav')
+    return np.array(a[1], dtype=float)
+
+def bode(audio):
+    f, t, Sxx = signal.spectrogram(audio, fs=sample_rate)
+    return np.apply_along_axis(np.max, 1, Sxx)
+    
     
 def main() -> None:
     """analyses of the data for project 2"""
@@ -35,28 +42,31 @@ def main() -> None:
     sample_rate = 40e3
 
     # petit plexiglass (1)
-    sweep1 = "preprocessed/petit_plexi/sweep1"
+    sweep1 = "petit_plexi/sweep1"
 
     # moyen plexiglass (2)
-    sweep2 = "preprocessed/moyen_plexi/sweep2"
+    sweep2 = "moyen_plexi/sweep2"
     
-    noise2 = "preprocessed/moyen_plexi/noise2"
+    noise2 = "moyen_plexi/noise2"
 
     # grosse vitre (3)
-    sweep3 = "preprocessed/grosse_vitre/sweep3"
+    sweep3 = "grosse_vitre/sweep3"
     
-    noise3 = "preprocessed/grosse_vitre/noise3"
+    noise3 = "grosse_vitre/noise3"
+
+    # cellophane
+    sweep = "cello/cello_sweep_std"
     
-    a = read(file1)
+    a = read(sweep + '.wav')
     audio = np.array(a[1], dtype=float)
     f, t, Sxx = signal.spectrogram(audio, fs=sample_rate)
-##    plt.specgram(audio, Fs=sample_rate)
-##    plt.show()
+    plt.specgram(audio, Fs=sample_rate)
+    plt.show()
 
     fig = plt.figure()
 
-##    ax = fig.add_subplot()#projection='3d')
-##    X, Y = np.meshgrid(f, t, indexing='ij')
+    ax = fig.add_subplot()#projection='3d')
+    X, Y = np.meshgrid(f, t, indexing='ij')
     amps = np.apply_along_axis(np.max, 1, Sxx)
 
     plt.semilogx(f, 20*np.log(amps/np.max(amps)))
